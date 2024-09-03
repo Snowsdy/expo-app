@@ -26,6 +26,15 @@ export default function TabLayout() {
           ),
         }}
       />
+      <Tabs.Screen
+        name="newTask"
+        options={{
+          title: "New Task",
+          tabBarIcon: ({ color, focused }) => (
+            <TabBarIcon name={focused ? "add-circle" : "add"} color={color} />
+          ),
+        }}
+      />
     </Tabs>
   );
 }
