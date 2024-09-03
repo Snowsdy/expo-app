@@ -38,12 +38,6 @@ export default function HomeScreen() {
     },
   });
 
-  const [isDeleting, setIsDeleting] = useState(false);
-  const onToggleSnackBar = () => setIsDeleting(!isDeleting);
-  const onDismissSnackBar = () => setIsDeleting(false);
-
-  const [deletingTask, setDeletingTask] = useState<TaskType | null>(null);
-
   const [updatingTask, setUpdatingTask] = useState<TaskType | null>(null);
   const [updatedGoal, setUpdatedGoal] = useState("");
 
@@ -65,8 +59,7 @@ export default function HomeScreen() {
                 key={item.id}
                 task={item}
                 onDelete={(task) => {
-                  setDeletingTask(task);
-                  onToggleSnackBar();
+                  deleteMutation.mutate(task.id);
                 }}
                 onUpdate={(task) => {
                   setUpdatingTask(task);
@@ -80,19 +73,6 @@ export default function HomeScreen() {
             refreshing={query.isFetching}
             style={{ width: "100%", height: "100%" }}
           />
-          <Snackbar
-            visible={isDeleting}
-            onDismiss={onDismissSnackBar}
-            action={{
-              label: "Got it.",
-              onPress: () => {
-                deleteMutation.mutate(deletingTask!.id);
-              },
-            }}>
-            <ThemedText type="default">
-              The task {deletingTask?.attributes.goal} has been deleted.
-            </ThemedText>
-          </Snackbar>
           <Snackbar
             visible={query.error != null ? true : false}
             onDismiss={() => {}}>
