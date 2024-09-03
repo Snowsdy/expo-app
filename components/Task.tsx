@@ -54,12 +54,14 @@ export function Task({ task, onDelete, onUpdate }: TaskProps) {
 const styles = StyleSheet.create({
   taskContainer: {
     flexDirection: "row",
+    flexWrap: "wrap",
     alignItems: "center",
     gap: 8,
     marginBottom: 8,
   },
   actionContainer: {
     flexDirection: "row",
+    flexWrap: "nowrap",
     alignItems: "center",
     gap: 8,
     borderRadius: 4,

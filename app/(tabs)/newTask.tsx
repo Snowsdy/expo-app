@@ -27,6 +27,11 @@ export default function NewTaskScreen() {
   return (
     <PaperProvider>
       <ThemedView style={styles.container}>
+        <ThemedText
+          type="title"
+          style={{ textAlign: "center", marginBottom: 8 }}>
+          Add a new Task
+        </ThemedText>
         <TextInput
           label="Goal"
           value={goal}

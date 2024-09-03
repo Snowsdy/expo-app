@@ -1,12 +1,11 @@
 import { deleteTodo, getTodos, putTodo } from "@/api/crud";
-import ParallaxScrollView from "@/components/ParallaxScrollView";
 import { Task } from "@/components/Task";
 import { ThemedText } from "@/components/ThemedText";
 import { ThemedView } from "@/components/ThemedView";
 import { TaskType } from "@/types/Task.type";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
-import { FlatList, Image, StyleSheet } from "react-native";
+import { FlatList, StyleSheet } from "react-native";
 import {
   Button,
   Dialog,
@@ -44,6 +43,7 @@ export default function HomeScreen() {
   return (
     <PaperProvider>
       <ThemedView style={styles.titleContainer}>
+        <ThemedText type="title">My TaskList</ThemedText>
         <FlatList
           data={query.data}
           renderItem={({ item }) => (
@@ -103,7 +103,7 @@ export default function HomeScreen() {
 const styles = StyleSheet.create({
   titleContainer: {
     flex: 1,
-    padding: 32,
+    padding: 48,
     gap: 16,
     overflow: "hidden",
     alignItems: "center",
