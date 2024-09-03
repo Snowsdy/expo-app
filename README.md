@@ -2,6 +2,8 @@
 
 This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
 
+Project using the following backend : [Strapi API](https://github.com/Snowsdy/strapi-api)
+
 ## Get started
 
 1. Install dependencies
