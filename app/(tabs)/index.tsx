@@ -43,77 +43,71 @@ export default function HomeScreen() {
 
   return (
     <PaperProvider>
-      <ParallaxScrollView
-        headerBackgroundColor={{ light: "#A1CEDC", dark: "#1D3D47" }}
-        headerImage={
-          <Image
-            source={require("@/assets/images/partial-react-logo.png")}
-            style={styles.reactLogo}
-          />
-        }>
-        <ThemedView style={styles.titleContainer}>
-          <FlatList
-            data={query.data}
-            renderItem={({ item }) => (
-              <Task
-                key={item.id}
-                task={item}
-                onDelete={(task) => {
-                  deleteMutation.mutate(task.id);
-                }}
-                onUpdate={(task) => {
-                  setUpdatingTask(task);
-                  setUpdatedGoal(task.attributes.goal);
-                }}
+      <ThemedView style={styles.titleContainer}>
+        <FlatList
+          data={query.data}
+          renderItem={({ item }) => (
+            <Task
+              key={item.id}
+              task={item}
+              onDelete={(task) => {
+                deleteMutation.mutate(task.id);
+              }}
+              onUpdate={(task) => {
+                setUpdatingTask(task);
+                setUpdatedGoal(task.attributes.goal);
+              }}
+            />
+          )}
+          ListEmptyComponent={
+            <ThemedText type="default">No tasks found.</ThemedText>
+          }
+          refreshing={query.isFetching}
+          style={{ width: "100%", height: "100%" }}
+        />
+        <Snackbar
+          visible={query.error != null ? true : false}
+          onDismiss={() => {}}>
+          {query.error?.message}
+        </Snackbar>
+        <Portal>
+          <Dialog
+            visible={updatingTask ? true : false}
+            onDismiss={() => setUpdatingTask(null)}>
+            <Dialog.Title>Updating Task</Dialog.Title>
+            <Dialog.Content>
+              <TextInput
+                label="Goal"
+                value={updatedGoal}
+                onChangeText={(text) => setUpdatedGoal(text)}
               />
-            )}
-            ListEmptyComponent={
-              <ThemedText type="default">No tasks found.</ThemedText>
-            }
-            refreshing={query.isFetching}
-            style={{ width: "100%", height: "100%" }}
-          />
-          <Snackbar
-            visible={query.error != null ? true : false}
-            onDismiss={() => {}}>
-            {query.error?.message}
-          </Snackbar>
-          <Portal>
-            <Dialog
-              visible={updatingTask ? true : false}
-              onDismiss={() => setUpdatingTask(null)}>
-              <Dialog.Title>Updating Task</Dialog.Title>
-              <Dialog.Content>
-                <TextInput
-                  label="Goal"
-                  value={updatedGoal}
-                  onChangeText={(text) => setUpdatedGoal(text)}
-                />
-              </Dialog.Content>
-              <Dialog.Actions>
-                <Button
-                  onPress={(e) => {
-                    e.preventDefault();
-                    var updatedTask = updatingTask!;
-                    updatedTask.attributes.goal = updatedGoal;
-                    putMutation.mutate(updatedTask);
-                  }}>
-                  <ThemedText type="default">Update</ThemedText>
-                </Button>
-              </Dialog.Actions>
-            </Dialog>
-          </Portal>
-        </ThemedView>
-      </ParallaxScrollView>
+            </Dialog.Content>
+            <Dialog.Actions>
+              <Button
+                onPress={(e) => {
+                  e.preventDefault();
+                  var updatedTask = updatingTask!;
+                  updatedTask.attributes.goal = updatedGoal;
+                  putMutation.mutate(updatedTask);
+                }}>
+                <ThemedText type="default">Update</ThemedText>
+              </Button>
+            </Dialog.Actions>
+          </Dialog>
+        </Portal>
+      </ThemedView>
     </PaperProvider>
   );
 }
 
 const styles = StyleSheet.create({
   titleContainer: {
-    flexDirection: "row",
+    flex: 1,
+    padding: 32,
+    gap: 16,
+    overflow: "hidden",
     alignItems: "center",
-    gap: 8,
+    // gap: 8,
   },
   stepContainer: {
     gap: 8,
