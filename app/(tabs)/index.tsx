@@ -42,12 +42,16 @@ export default function HomeScreen() {
     axios
       .delete(STRAPI_URL + `/tasks/${task.id}`)
       .then(({}) => {
-        setIsLoading(false);
+        setIsLoading(true);
+        setDeletingTask(null);
+        loadTasks();
       })
       .catch((e) => {
         console.error(e);
         setError("An error occured, please try again later.");
-        setIsLoading(false);
+        setIsLoading(true);
+        setDeletingTask(null);
+        loadTasks();
       });
   }
 
@@ -88,10 +92,11 @@ export default function HomeScreen() {
             label: "Got it.",
             onPress: () => {
               removeTask(deletingTask!);
-              setDeletingTask(null);
             },
           }}>
-          The task {deletingTask?.attributes.goal} has been deleted.
+          <ThemedText type="default">
+            The task {deletingTask?.attributes.goal} has been deleted.
+          </ThemedText>
         </Snackbar>
         <Snackbar visible={error.length > 0} onDismiss={() => setError("")}>
           {error}
