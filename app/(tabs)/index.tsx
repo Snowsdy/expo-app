@@ -1,50 +1,101 @@
-import { Image, StyleSheet, Platform } from 'react-native';
-
-import { HelloWave } from '@/components/HelloWave';
-import ParallaxScrollView from '@/components/ParallaxScrollView';
-import { ThemedText } from '@/components/ThemedText';
-import { ThemedView } from '@/components/ThemedView';
+import { Image, StyleSheet, FlatList } from "react-native";
+import axios from "axios";
+import ParallaxScrollView from "@/components/ParallaxScrollView";
+import { ThemedText } from "@/components/ThemedText";
+import { ThemedView } from "@/components/ThemedView";
+import { useEffect, useState } from "react";
+import { TaskType } from "@/types/Task.type";
+import { Snackbar } from "react-native-paper";
+import { Task } from "@/components/Task";
+import { STRAPI_URL } from "babel-dotenv";
 
 export default function HomeScreen() {
+  const [tasks, setTasks] = useState<TaskType[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState("");
+
+  const [isDeleting, setIsDeleting] = useState(false);
+  const onToggleSnackBar = () => setIsDeleting(!isDeleting);
+  const onDismissSnackBar = () => setIsDeleting(false);
+
+  const [deletingTask, setDeletingTask] = useState<TaskType | null>(null);
+
+  useEffect(() => {
+    loadTasks();
+  }, []);
+
+  function loadTasks() {
+    axios
+      .get(STRAPI_URL + "/tasks")
+      .then(({ data }) => {
+        setTasks(data.data as TaskType[]);
+        setIsLoading(false);
+      })
+      .catch((e) => {
+        console.error(e);
+        setError("An error occured, please try again later.");
+        setIsLoading(false);
+      });
+  }
+
+  function removeTask(task: TaskType) {
+    axios
+      .delete(STRAPI_URL + `/tasks/${task.id}`)
+      .then(({}) => {
+        setIsLoading(false);
+      })
+      .catch((e) => {
+        console.error(e);
+        setError("An error occured, please try again later.");
+        setIsLoading(false);
+      });
+  }
+
   return (
     <ParallaxScrollView
-      headerBackgroundColor={{ light: '#A1CEDC', dark: '#1D3D47' }}
+      headerBackgroundColor={{ light: "#A1CEDC", dark: "#1D3D47" }}
       headerImage={
         <Image
-          source={require('@/assets/images/partial-react-logo.png')}
+          source={require("@/assets/images/partial-react-logo.png")}
           style={styles.reactLogo}
         />
       }>
       <ThemedView style={styles.titleContainer}>
-        <ThemedText type="title">Welcome!</ThemedText>
-        <HelloWave />
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 1: Try it</ThemedText>
-        <ThemedText>
-          Edit <ThemedText type="defaultSemiBold">app/(tabs)/index.tsx</ThemedText> to see changes.
-          Press{' '}
-          <ThemedText type="defaultSemiBold">
-            {Platform.select({ ios: 'cmd + d', android: 'cmd + m' })}
-          </ThemedText>{' '}
-          to open developer tools.
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 2: Explore</ThemedText>
-        <ThemedText>
-          Tap the Explore tab to learn more about what's included in this starter app.
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 3: Get a fresh start</ThemedText>
-        <ThemedText>
-          When you're ready, run{' '}
-          <ThemedText type="defaultSemiBold">npm run reset-project</ThemedText> to get a fresh{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> directory. This will move the current{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> to{' '}
-          <ThemedText type="defaultSemiBold">app-example</ThemedText>.
-        </ThemedText>
+        <FlatList
+          data={tasks}
+          renderItem={({ item }) => (
+            <Task
+              key={item.id}
+              task={item}
+              onDelete={(task) => {
+                setDeletingTask(task);
+                onToggleSnackBar();
+              }}
+              onUpdate={(task) => {}}
+            />
+          )}
+          ListEmptyComponent={
+            <ThemedText type="default">No tasks found.</ThemedText>
+          }
+          refreshing={isLoading}
+          onRefresh={loadTasks}
+          style={{ width: "100%", height: "100%" }}
+        />
+        <Snackbar
+          visible={isDeleting}
+          onDismiss={onDismissSnackBar}
+          action={{
+            label: "Got it.",
+            onPress: () => {
+              removeTask(deletingTask!);
+              setDeletingTask(null);
+            },
+          }}>
+          The task {deletingTask?.attributes.goal} has been deleted.
+        </Snackbar>
+        <Snackbar visible={error.length > 0} onDismiss={() => setError("")}>
+          {error}
+        </Snackbar>
       </ThemedView>
     </ParallaxScrollView>
   );
@@ -52,8 +103,8 @@ export default function HomeScreen() {
 
 const styles = StyleSheet.create({
   titleContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     gap: 8,
   },
   stepContainer: {
@@ -65,6 +116,10 @@ const styles = StyleSheet.create({
     width: 290,
     bottom: 0,
     left: 0,
-    position: 'absolute',
+    position: "absolute",
+  },
+  captionNoTasks: {
+    marginTop: 10,
+    textAlign: "center",
   },
 });
